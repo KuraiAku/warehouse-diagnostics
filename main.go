@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"warehouse-diagnostics/internal/inventory"
 )
 
 func main() {
@@ -46,7 +47,7 @@ func main() {
 		fmt.Println(result)
 
 	case "inventory-all":
-		items := inventoryAll()
+		items := inventory.InventoryAll()
 
 		for _, item := range items {
 
@@ -57,11 +58,6 @@ func main() {
 	default:
 		fmt.Println("Unknown command:", command)
 	}
-}
-
-type Inventory struct {
-	SKU      string
-	Quantity int
 }
 
 func ordersSummary(status string) (string, error) {
@@ -77,41 +73,11 @@ func inventorySummary(sku string) (string, error) {
 		return "", fmt.Errorf("SKU cannot be empty")
 	}
 
-	item, err := findInventory(sku)
+	item, err := inventory.FindInventory(sku)
 
 	if err != nil {
 		return "", err
 	}
 
 	return fmt.Sprintf("inventory %s quantity %d", item.SKU, item.Quantity), nil
-}
-
-func inventoryAll() []Inventory {
-
-	items := []Inventory{
-		{
-			SKU:      "BOX-1001",
-			Quantity: 100,
-		},
-
-		{
-			SKU:      "PAL-2001",
-			Quantity: 45,
-		},
-	}
-
-	return items
-}
-
-func findInventory(sku string) (Inventory, error) {
-
-	items := inventoryAll()
-
-	for _, item := range items {
-		if item.SKU == sku {
-			return item, nil
-		}
-	}
-
-	return Inventory{}, fmt.Errorf("SKU %s does not exist", sku)
 }
