@@ -31,3 +31,4 @@ func FindInventory(sku string) (Inventory, error) {
 
 	return Inventory{}, fmt.Errorf("SKU %s does not exist", sku)
 }
+
