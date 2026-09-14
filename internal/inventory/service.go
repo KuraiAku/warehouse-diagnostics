@@ -32,3 +32,16 @@ func FindInventory(sku string) (Inventory, error) {
 	return Inventory{}, fmt.Errorf("SKU %s does not exist", sku)
 }
 
+func LowInventory(threshold int) []Inventory {
+
+	results := []Inventory{}
+
+	for _, item := range InventoryAll() {
+		if item.Quantity < threshold {
+			results = append(results, item)
+		}
+	}
+
+	return results
+
+}

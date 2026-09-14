@@ -24,6 +24,9 @@ func Execute() {
 	case "orders-summary":
 		handleOrdersSummary()
 
+	case "inventory-low":
+		handleLowInventory()
+
 	default:
 		fmt.Println("Unknown command:", command)
 	}
