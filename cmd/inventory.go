@@ -8,10 +8,13 @@ import (
 )
 
 func handleInventoryAll() {
-	items := inventory.InventoryAll()
-
+	items, err := inventory.InventoryAll()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	for _, item := range items {
-		fmt.Println(item.SKU, item.Quantity)
+		fmt.Println(item.WarehouseCode, item.SKU, item.Quantity)
 	}
 }
 
@@ -28,7 +31,7 @@ func handleInventory() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(item.SKU, item.Quantity)
+	fmt.Println(item.WarehouseCode, item.SKU, item.Quantity)
 
 }
 
@@ -44,9 +47,15 @@ func handleLowInventory() {
 		fmt.Println("Threshold must be a number")
 		return
 	}
-	items := inventory.LowInventory(threshold)
+
+	items, err := inventory.LowInventory(threshold)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	for _, item := range items {
-		fmt.Println(item.SKU, item.Quantity)
+		fmt.Println(item.WarehouseCode, item.SKU, item.Quantity)
 	}
 }

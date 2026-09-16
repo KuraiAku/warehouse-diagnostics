@@ -1,27 +1,18 @@
 package inventory
 
-import "fmt"
+import (
+	"fmt"
+)
 
-func InventoryAll() []Inventory {
-
-	items := []Inventory{
-		{
-			SKU:      "BOX-1001",
-			Quantity: 100,
-		},
-
-		{
-			SKU:      "PAL-2001",
-			Quantity: 45,
-		},
-	}
-
-	return items
+func InventoryAll() ([]Inventory, error) {
+	return getAllInventory()
 }
-
 func FindInventory(sku string) (Inventory, error) {
 
-	items := InventoryAll()
+	items, err := InventoryAll()
+	if err != nil {
+		return Inventory{}, err
+	}
 
 	for _, item := range items {
 		if item.SKU == sku {
@@ -32,16 +23,21 @@ func FindInventory(sku string) (Inventory, error) {
 	return Inventory{}, fmt.Errorf("SKU %s does not exist", sku)
 }
 
-func LowInventory(threshold int) []Inventory {
+func LowInventory(threshold int) ([]Inventory, error) {
 
 	results := []Inventory{}
 
-	for _, item := range InventoryAll() {
+	items, err := InventoryAll()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, item := range items {
 		if item.Quantity < threshold {
 			results = append(results, item)
 		}
 	}
 
-	return results
+	return results, nil
 
 }
