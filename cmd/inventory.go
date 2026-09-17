@@ -20,12 +20,14 @@ func handleInventoryAll() {
 
 func handleInventory() {
 
-	if len(os.Args) < 3 {
-		fmt.Println("Please add SKU")
+	if len(os.Args) < 4 {
+		fmt.Println("Please add warehouse code and SKU")
 		return
 	}
-	sku := os.Args[2]
-	item, err := inventory.FindInventory(sku)
+
+	warehouseCode := os.Args[2]
+	sku := os.Args[3]
+	item, err := inventory.FindInventory(warehouseCode, sku)
 
 	if err != nil {
 		fmt.Println(err)
