@@ -5,3 +5,12 @@ type Inventory struct {
 	SKU      string
 	Quantity int
 }
+
+
+type OrderSummary struct {
+
+	Status	string
+	OrderCount	int
+	TotalAmount float64
+	
+}
