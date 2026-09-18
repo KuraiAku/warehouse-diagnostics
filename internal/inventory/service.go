@@ -26,3 +26,7 @@ func LowInventory(threshold int) ([]Inventory, error) {
 	return results, nil
 
 }
+
+func GetOrdersSummary(status string) (OrderSummary, error) {
+	return OrdersSummary(status)
+}

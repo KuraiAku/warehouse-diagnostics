@@ -69,3 +69,24 @@ func findInventory(warehouseCode string, sku string) (Inventory, error) {
 	return item, nil
 
 }
+
+func OrdersSummary(status string) (OrderSummary, error) {
+	db, err := database.Open()
+	if err != nil {
+		return OrderSummary{}, err
+	}
+	defer db.Close()
+	var item OrderSummary
+
+	row := db.QueryRow(`
+        SELECT @p1, COUNT(*), COALESCE(SUM(total_amount), 0)
+    	FROM orders
+    	WHERE status = @p1; 
+    	`, status)
+
+	if err := row.Scan(&item.Status, &item.OrderCount, &item.TotalAmount); err != nil {
+		return OrderSummary{}, err
+	}
+
+	return item, nil
+}
