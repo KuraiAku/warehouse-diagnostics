@@ -9,21 +9,7 @@ func FindInventory(warehouseCode, sku string) (Inventory, error) {
 }
 
 func LowInventory(threshold int) ([]Inventory, error) {
-
-	results := []Inventory{}
-
-	items, err := InventoryAll()
-	if err != nil {
-		return nil, err
-	}
-
-	for _, item := range items {
-		if item.Quantity < threshold {
-			results = append(results, item)
-		}
-	}
-
-	return results, nil
+	return findLowInventory(threshold)
 
 }
 
