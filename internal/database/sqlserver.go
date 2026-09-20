@@ -7,8 +7,8 @@ import (
 	_ "github.com/microsoft/go-mssqldb"
 )
 
-func Open() (*sql.DB, error) {
-	connectionString := os.Getenv("WAREHOUSE_DB_URL")
+func OpenFromEnv(envName string) (*sql.DB, error) {
+	connectionString := os.Getenv(envName)
 
 	db, err := sql.Open("sqlserver", connectionString)
 	if err != nil {
@@ -21,4 +21,8 @@ func Open() (*sql.DB, error) {
 	}
 
 	return db, nil
+}
+
+func Open() (*sql.DB, error) {
+	return OpenFromEnv("WAREHOUSE_DB_URL")
 }

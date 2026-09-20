@@ -26,6 +26,9 @@ func Execute() {
 
 	case "inventory-low":
 		handleLowInventory()
+		
+	case "picking-backlog":
+		handlePickingBacklog()
 
 	default:
 		fmt.Println("Unknown command:", command)
