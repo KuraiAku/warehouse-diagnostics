@@ -11,9 +11,9 @@ func handleOrdersSummary() {
 		fmt.Println("Please add status")
 		return
 	}
-	
+
 	status := os.Args[2]
-	
+
 	summary, err := inventory.GetOrdersSummary(status)
 	if err != nil {
 		fmt.Println(err)
@@ -22,4 +22,3 @@ func handleOrdersSummary() {
 
 	fmt.Println(summary.Status, summary.OrderCount, summary.TotalAmount)
 }
-
