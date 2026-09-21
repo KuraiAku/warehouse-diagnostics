@@ -89,6 +89,22 @@ Warehouse.StockItems
 Warehouse.StockItemHoldings
 ```
 
+### Find inventory risk
+
+```bash
+go run main.go inventory-risk
+```
+
+Finds unfinished order lines where the remaining quantity to pick is greater than the current quantity on hand.
+
+For this project, an inventory risk is defined as:
+
+```text
+RemainingToPick > QuantityOnHand
+```
+
+This diagnostic reuses the same order, order-line, stock-item, and stock-holding relationships as the picking backlog query, but adds a stricter SQL filter to surface lines that may not have enough current stock to satisfy the remaining picking work.
+
 ## Project Structure
 
 ```text
@@ -192,6 +208,8 @@ expose it through the CLI
     ↓
 diagnose operational problems
 ```
+
+Current diagnostics now include both general picking backlog visibility and a more focused inventory-risk check.
 
 Planned areas include:
 
