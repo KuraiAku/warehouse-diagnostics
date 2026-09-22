@@ -111,3 +111,65 @@ func getInventoryRisk() ([]PickingBacklogItem, error) {
 
 	return items, nil
 }
+
+func getOrderDetails(OrderID int) ([]OrderLineDetails, error) {
+
+	db, err := database.OpenFromEnv("WWI_DB_URL")
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	rows, err := db.Query(`
+	
+		SELECT
+			o.OrderID,
+			CONVERT(varchar(10), o.OrderDate, 23),
+			si.StockItemName,
+			ol.Quantity,
+			ol.PickedQuantity,
+			ol.Quantity - ol.PickedQuantity AS RemainingToPick,
+			h.QuantityOnHand
+		FROM Sales.Orders o
+		JOIN Sales.OrderLines ol
+			ON o.OrderID = ol.OrderID
+		JOIN Warehouse.StockItems si
+			ON ol.StockItemID = si.StockItemID
+		JOIN Warehouse.StockItemHoldings h
+			ON ol.StockItemID = h.StockItemID
+		WHERE o.OrderID = @p1
+		ORDER BY o.OrderDate ASC, o.OrderID ASC;
+			 `, OrderID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	items := []OrderLineDetails{}
+
+	for rows.Next() {
+		var item OrderLineDetails
+
+		if err := rows.Scan(
+			&item.OrderID,
+			&item.OrderDate,
+			&item.StockItemName,
+			&item.OrderedQuantity,
+			&item.PickedQuantity,
+			&item.RemainingToPick,
+			&item.QuantityOnHand,
+		); err != nil {
+			return nil, err
+		}
+
+		items = append(items, item)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return items, nil
+
+}
