@@ -32,6 +32,9 @@ func Execute() {
 
 	case "inventory-risk":
 		handleInventoryRisk()
+		
+	case "order-details":
+		handleOrderDetails()
 
 	default:
 		fmt.Println("Unknown command:", command)
