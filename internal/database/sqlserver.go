@@ -22,7 +22,3 @@ func OpenFromEnv(envName string) (*sql.DB, error) {
 
 	return db, nil
 }
-
-func Open() (*sql.DB, error) {
-	return OpenFromEnv("WAREHOUSE_DB_URL")
-}

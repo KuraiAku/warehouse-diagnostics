@@ -6,7 +6,6 @@ import (
 )
 
 func Execute() {
-
 	if len(os.Args) < 2 {
 		fmt.Println("Please provide a command")
 		return
@@ -15,27 +14,12 @@ func Execute() {
 	command := os.Args[1]
 
 	switch command {
-	case "inventory-all":
-		handleInventoryAll()
-
-	case "inventory":
-		handleInventory()
-
-	case "orders-summary":
-		handleOrdersSummary()
-
-	case "inventory-low":
-		handleLowInventory()
-
 	case "picking-backlog":
 		handlePickingBacklog()
-
 	case "inventory-risk":
 		handleInventoryRisk()
-		
 	case "order-details":
 		handleOrderDetails()
-
 	default:
 		fmt.Println("Unknown command:", command)
 	}

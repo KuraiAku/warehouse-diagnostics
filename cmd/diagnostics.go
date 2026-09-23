@@ -47,7 +47,6 @@ func handleInventoryRisk() {
 }
 
 func handleOrderDetails() {
-		
 	if len(os.Args) < 3 {
 		fmt.Println("Please add OrderID")
 		return
@@ -58,9 +57,8 @@ func handleOrderDetails() {
 		fmt.Println("OrderID must be a number")
 		return
 	}
-	
-	
-	items, err := diagnostics.OrderDetails(orderID) 
+
+	items, err := diagnostics.OrderDetails(orderID)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -68,14 +66,14 @@ func handleOrderDetails() {
 
 	for _, item := range items {
 		fmt.Printf(
-		"%d %s %s %d %d %d %d\n",
-		item.OrderID,
-		item.OrderDate,
-		item.StockItemName,
-		item.OrderedQuantity,
-		item.PickedQuantity,
-		item.RemainingToPick,
-		item.QuantityOnHand,
+			"%d %s %s %d %d %d %d\n",
+			item.OrderID,
+			item.OrderDate,
+			item.StockItemName,
+			item.OrderedQuantity,
+			item.PickedQuantity,
+			item.RemainingToPick,
+			item.QuantityOnHand,
 		)
-	}	
+	}
 }

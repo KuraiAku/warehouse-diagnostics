@@ -57,7 +57,6 @@ func getPickingBacklog() ([]PickingBacklogItem, error) {
 }
 
 func getInventoryRisk() ([]PickingBacklogItem, error) {
-
 	db, err := database.OpenFromEnv("WWI_DB_URL")
 	if err != nil {
 		return nil, err
@@ -112,8 +111,7 @@ func getInventoryRisk() ([]PickingBacklogItem, error) {
 	return items, nil
 }
 
-func getOrderDetails(OrderID int) ([]OrderLineDetails, error) {
-
+func getOrderDetails(orderID int) ([]OrderLineDetails, error) {
 	db, err := database.OpenFromEnv("WWI_DB_URL")
 	if err != nil {
 		return nil, err
@@ -121,7 +119,6 @@ func getOrderDetails(OrderID int) ([]OrderLineDetails, error) {
 	defer db.Close()
 
 	rows, err := db.Query(`
-	
 		SELECT
 			o.OrderID,
 			CONVERT(varchar(10), o.OrderDate, 23),
@@ -139,12 +136,10 @@ func getOrderDetails(OrderID int) ([]OrderLineDetails, error) {
 			ON ol.StockItemID = h.StockItemID
 		WHERE o.OrderID = @p1
 		ORDER BY o.OrderDate ASC, o.OrderID ASC;
-			 `, OrderID)
-
+	`, orderID)
 	if err != nil {
 		return nil, err
 	}
-
 	defer rows.Close()
 
 	items := []OrderLineDetails{}
@@ -166,10 +161,10 @@ func getOrderDetails(OrderID int) ([]OrderLineDetails, error) {
 
 		items = append(items, item)
 	}
+
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
 	return items, nil
-
 }
