@@ -64,6 +64,40 @@ Investigates one order and returns each order line with:
 
 This makes it possible to move from a broad diagnostic such as `inventory-risk` into a specific order investigation.
 
+### Risk summary
+
+```bash
+go run main.go risk-summary
+```
+
+Returns one aggregate summary of the current inventory-risk backlog, including:
+
+- unique risky orders
+- risky order lines
+- unique affected stock items
+- total remaining units across risky lines
+- oldest affected order date
+
+This command uses SQL aggregates such as `COUNT`, `COUNT(DISTINCT ...)`, `SUM`, and `MIN` and returns a single summary row through `QueryRow()`.
+
+### Items at risk
+
+```bash
+go run main.go items-at-risk
+```
+
+Groups inventory-risk results by stock item and returns:
+
+- stock item name
+- unique risky orders for that item
+- risky order lines
+- total remaining units
+- current quantity on hand
+
+Results are ordered by total remaining units so the largest item-level risks appear first.
+
+This command introduces grouped aggregation with `GROUP BY`, making it possible to move from one overall risk summary into item-level analysis.
+
 ## Data Relationships
 
 The current diagnostics use these WideWorldImporters tables:
@@ -135,10 +169,33 @@ expose it through the CLI
 diagnose an operational problem
 ```
 
+The current diagnostic flow supports both detailed investigation and aggregate analysis:
+
+```text
+picking-backlog
+    ↓
+inventory-risk
+    ↓
+risk-summary / items-at-risk
+    ↓
+order-details <OrderID>
+```
+
+Current SQL practice includes:
+
+- multi-table joins
+- parameterized queries
+- calculated columns
+- filtering with `WHERE`
+- single-row aggregates
+- `COUNT(DISTINCT ...)`
+- `SUM` and `MIN`
+- grouped aggregation with `GROUP BY`
+- ordering aggregate results
+
 Planned areas include:
 
-- summary and aggregate diagnostics
-- more advanced SQL joins and aggregations
+- additional grouped and historical diagnostics
 - indexing and query performance
 - execution plans
 - automated tests
