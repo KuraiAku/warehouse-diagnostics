@@ -15,3 +15,7 @@ func OrderDetails(orderID int) ([]OrderLineDetails, error) {
 func GetRiskSummary() (RiskSummary, error) {
 	return getRiskSummary()
 }
+
+func GetItemRiskSummary() ([]ItemRiskSummary, error) {
+	return getItemRiskSummary()
+}

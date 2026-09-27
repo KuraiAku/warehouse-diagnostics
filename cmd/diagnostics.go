@@ -94,3 +94,23 @@ func handleRiskSummary() {
 		summary.OldestOrderDate,
 	)
 }
+
+func handleItemRiskSummary() {
+	items, err := diagnostics.GetItemRiskSummary()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	for _, item := range items {
+
+		fmt.Printf(
+			"Stock Item Name: %s\nRisky Orders: %d\nRiskyLines: %d\nTotal Remaining: %d\nQuantityOnHand: %d\n",
+			item.StockItemName,
+			item.RiskyOrders,
+			item.RiskyLines,
+			item.TotalRemaining,
+			item.QuantityOnHand,
+		)
+	}
+}

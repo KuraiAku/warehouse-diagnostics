@@ -111,7 +111,7 @@ func getInventoryRisk() ([]PickingBacklogItem, error) {
 	return items, nil
 }
 
-func getOrderDetails(orderID int) ([]OrderLineDetails, error) {
+func getOrderDetails(orderID int) ([]OrderLineDetails, error) { // this function goes through the database and returns the details of a all the items in that customers order.
 	db, err := database.OpenFromEnv("WWI_DB_URL")
 	if err != nil {
 		return nil, err
@@ -169,7 +169,7 @@ func getOrderDetails(orderID int) ([]OrderLineDetails, error) {
 	return items, nil
 }
 
-func getRiskSummary() (RiskSummary, error) {
+func getRiskSummary() (RiskSummary, error) { // This function gives us a summary of all the items that are at risk.
 	db, err := database.OpenFromEnv("WWI_DB_URL")
 	if err != nil {
 		return RiskSummary{}, err
@@ -207,4 +207,61 @@ func getRiskSummary() (RiskSummary, error) {
 	}
 
 	return summary, nil
+}
+
+func getItemRiskSummary() ([]ItemRiskSummary, error) {
+	db, err := database.OpenFromEnv("WWI_DB_URL")
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	rows, err := db.Query(`
+	SELECT
+		si.StockItemName,
+		COUNT(DISTINCT o.OrderID),
+		COUNT(*) AS RiskyLines,
+		SUM(ol.Quantity - ol.PickedQuantity) AS TotalRemaining,
+		h.QuantityOnHand
+	FROM
+		Sales.Orders o
+	JOIN Sales.OrderLines ol
+		ON o.OrderID = ol.OrderID
+	JOIN Warehouse.StockItems si
+		ON ol.StockItemID = si.StockItemID
+	JOIN Warehouse.StockItemHoldings h
+		ON si.StockItemID = h.StockItemID
+	WHERE (ol.PickedQuantity < ol.Quantity)
+		AND	(ol.Quantity - ol.PickedQuantity) > h.QuantityOnHand
+	GROUP BY si.StockItemID, si.StockItemName, h.QuantityOnHand
+	ORDER BY TotalRemaining DESC;
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	items := []ItemRiskSummary{}
+
+	for rows.Next() {
+		var item ItemRiskSummary
+
+		if err := rows.Scan(
+			&item.StockItemName,
+			&item.RiskyOrders,
+			&item.RiskyLines,
+			&item.TotalRemaining,
+			&item.QuantityOnHand,
+		); err != nil {
+			return nil, err
+		}
+
+		items = append(items, item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return items, nil
 }

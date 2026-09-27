@@ -22,6 +22,8 @@ func Execute() {
 		handleOrderDetails()
 	case "risk-summary":
 		handleRiskSummary()
+	case "items-at-risk":
+		handleItemRiskSummary()
 	default:
 		fmt.Println("Unknown command:", command)
 	}

@@ -25,3 +25,11 @@ type RiskSummary struct {
 	TotalRemaining     int
 	OldestOrderDate    string
 }
+
+type ItemRiskSummary struct {
+	StockItemName  string
+	RiskyOrders    int
+	RiskyLines     int
+	TotalRemaining int
+	QuantityOnHand int
+}
