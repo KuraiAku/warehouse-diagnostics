@@ -20,6 +20,8 @@ func Execute() {
 		handleInventoryRisk()
 	case "order-details":
 		handleOrderDetails()
+	case "risk-summary":
+		handleRiskSummary()
 	default:
 		fmt.Println("Unknown command:", command)
 	}

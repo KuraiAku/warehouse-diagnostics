@@ -17,3 +17,11 @@ type OrderLineDetails struct {
 	RemainingToPick int
 	QuantityOnHand  int
 }
+
+type RiskSummary struct {
+	RiskyOrders        int
+	RiskyLines         int
+	AffectedStockItems int
+	TotalRemaining     int
+	OldestOrderDate    string
+}

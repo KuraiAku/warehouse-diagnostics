@@ -11,3 +11,7 @@ func InventoryRisk() ([]PickingBacklogItem, error) {
 func OrderDetails(orderID int) ([]OrderLineDetails, error) {
 	return getOrderDetails(orderID)
 }
+
+func GetRiskSummary() (RiskSummary, error) {
+	return getRiskSummary()
+}

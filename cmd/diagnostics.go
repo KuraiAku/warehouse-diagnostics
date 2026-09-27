@@ -77,3 +77,20 @@ func handleOrderDetails() {
 		)
 	}
 }
+
+func handleRiskSummary() {
+	summary, err := diagnostics.GetRiskSummary()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf(
+		"Risky Orders: %d\nRisky Lines: %d\nAffected Stock Items: %d\nTotal Remaining: %d\nOldest Order Date: %s\n",
+		summary.RiskyOrders,
+		summary.RiskyLines,
+		summary.AffectedStockItems,
+		summary.TotalRemaining,
+		summary.OldestOrderDate,
+	)
+}

@@ -168,3 +168,43 @@ func getOrderDetails(orderID int) ([]OrderLineDetails, error) {
 
 	return items, nil
 }
+
+func getRiskSummary() (RiskSummary, error) {
+	db, err := database.OpenFromEnv("WWI_DB_URL")
+	if err != nil {
+		return RiskSummary{}, err
+	}
+	defer db.Close()
+
+	row := db.QueryRow(`
+		SELECT
+			COUNT(DISTINCT o.OrderID),
+			COUNT(*),
+			COUNT(DISTINCT si.StockItemID),
+			SUM(ol.Quantity - ol.PickedQuantity),
+			CONVERT(varchar(10), MIN(o.OrderDate), 23)
+		FROM Sales.Orders o
+		JOIN Sales.OrderLines ol
+			ON o.OrderID = ol.OrderID
+		JOIN Warehouse.StockItems si
+			ON ol.StockItemID = si.StockItemID
+		JOIN Warehouse.StockItemHoldings h
+			ON ol.StockItemID = h.StockItemID
+		WHERE ol.PickedQuantity < ol.Quantity
+			AND (ol.Quantity - ol.PickedQuantity) > h.QuantityOnHand;
+	`)
+
+	var summary RiskSummary
+
+	if err := row.Scan(
+		&summary.RiskyOrders,
+		&summary.RiskyLines,
+		&summary.AffectedStockItems,
+		&summary.TotalRemaining,
+		&summary.OldestOrderDate,
+	); err != nil {
+		return RiskSummary{}, err
+	}
+
+	return summary, nil
+}
