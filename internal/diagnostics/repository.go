@@ -265,3 +265,56 @@ func getItemRiskSummary() ([]ItemRiskSummary, error) {
 
 	return items, nil
 }
+
+func getRiskByYear() ([]YearRiskSummary, error) {
+	db, err := database.OpenFromEnv("WWI_DB_URL")
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	rows, err := db.Query(`
+	SELECT
+		YEAR(o.OrderDate) AS Year,
+		COUNT(DISTINCT o.OrderID),
+		COUNT(*) AS RiskyLines,
+		SUM(ol.Quantity - ol.PickedQuantity) AS TotalRemaining
+	FROM
+		Sales.Orders o
+	JOIN Sales.OrderLines ol
+		ON o.OrderID = ol.OrderID
+	JOIN Warehouse.StockItemHoldings h
+		ON ol.StockItemID = h.StockItemID
+	WHERE (ol.PickedQuantity < ol.Quantity)
+		AND	(ol.Quantity - ol.PickedQuantity) > h.QuantityOnHand
+	GROUP BY Year(o.OrderDate) 
+	ORDER BY YEAR(o.OrderDate) ASC;
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	items := []YearRiskSummary{}
+
+	for rows.Next() {
+		var item YearRiskSummary
+
+		if err := rows.Scan(
+			&item.Year,
+			&item.RiskyOrders,
+			&item.RiskyLines,
+			&item.TotalRemaining,
+		); err != nil {
+			return nil, err
+		}
+
+		items = append(items, item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}

@@ -33,3 +33,10 @@ type ItemRiskSummary struct {
 	TotalRemaining int
 	QuantityOnHand int
 }
+
+type YearRiskSummary struct {
+	Year           int
+	RiskyOrders    int
+	RiskyLines     int
+	TotalRemaining int
+}

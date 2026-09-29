@@ -24,6 +24,8 @@ func Execute() {
 		handleRiskSummary()
 	case "items-at-risk":
 		handleItemRiskSummary()
+	case "risk-by-year":
+		handleRiskByYear()
 	default:
 		fmt.Println("Unknown command:", command)
 	}

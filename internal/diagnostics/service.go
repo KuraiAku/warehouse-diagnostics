@@ -19,3 +19,7 @@ func GetRiskSummary() (RiskSummary, error) {
 func GetItemRiskSummary() ([]ItemRiskSummary, error) {
 	return getItemRiskSummary()
 }
+
+func GetRiskByYearSummary() ([]YearRiskSummary, error) {
+	return getRiskByYear()
+}

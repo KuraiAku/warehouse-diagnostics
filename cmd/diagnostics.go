@@ -114,3 +114,22 @@ func handleItemRiskSummary() {
 		)
 	}
 }
+
+func handleRiskByYear() {
+	items, err := diagnostics.GetRiskByYearSummary()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	for _, item := range items {
+
+		fmt.Printf(
+			"Year: %d\nRisky Orders: %d\nRiskyLines: %d\nTotal Remaining: %d\n",
+			item.Year,
+			item.RiskyOrders,
+			item.RiskyLines,
+			item.TotalRemaining,
+		)
+	}
+}
