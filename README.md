@@ -98,6 +98,47 @@ Results are ordered by total remaining units so the largest item-level risks app
 
 This command introduces grouped aggregation with `GROUP BY`, making it possible to move from one overall risk summary into item-level analysis.
 
+### Risk by year
+
+```bash
+go run main.go risk-by-year
+```
+
+Groups inventory-risk results by order year and returns:
+
+- year
+- unique risky orders
+- risky order lines
+- total remaining units
+
+This command is used to distinguish historical risk from more recent operational risk and adds time-based grouping with `YEAR(...)` and `GROUP BY`.
+
+### Recent risk summary
+
+```bash
+go run main.go recent-risk-summary
+```
+
+Summarizes inventory risk within the final 30 days of the dataset.
+
+The command first finds the latest order date in WideWorldImporters, then uses that date as the dataset-relative endpoint for a 30-day window. It returns:
+
+- window start
+- window end
+- unique risky orders
+- risky order lines
+- total remaining units
+
+This avoids treating the sample database's historical records as if they were current-day production data.
+
+The query introduces:
+
+- a CTE with `WITH ... AS (...)`
+- `MAX(...)` to find the latest order date
+- `DATEADD(...)` to calculate the window start
+- `CROSS JOIN` to make the one-row CTE result available to the main query
+- `COALESCE(...)` to safely handle empty aggregate results
+
 ## Data Relationships
 
 The current diagnostics use these WideWorldImporters tables:
@@ -176,7 +217,9 @@ picking-backlog
     ↓
 inventory-risk
     ↓
-risk-summary / items-at-risk
+risk-summary
+    ↓
+items-at-risk / risk-by-year / recent-risk-summary
     ↓
 order-details <OrderID>
 ```
@@ -187,16 +230,23 @@ Current SQL practice includes:
 - parameterized queries
 - calculated columns
 - filtering with `WHERE`
-- single-row aggregates
+- single-row aggregates with `QueryRow()`
+- multi-row grouped results with `Query()`
 - `COUNT(DISTINCT ...)`
-- `SUM` and `MIN`
+- `SUM`, `MIN`, and `MAX`
 - grouped aggregation with `GROUP BY`
+- time-based grouping with `YEAR(...)`
+- CTEs
+- `DATEADD(...)`
+- `CROSS JOIN`
+- `COALESCE(...)`
 - ordering aggregate results
 
 Planned areas include:
 
-- additional grouped and historical diagnostics
+- additional operational and historical diagnostics
 - indexing and query performance
 - execution plans
 - automated tests
 - ClickHouse for historical and analytical workloads
+- AI-assisted diagnostic commands after the core SQL and ClickHouse workflows are established
