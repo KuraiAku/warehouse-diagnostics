@@ -287,9 +287,10 @@ func getRiskByYear() ([]YearRiskSummary, error) {
 		ON ol.StockItemID = h.StockItemID
 	WHERE (ol.PickedQuantity < ol.Quantity)
 		AND	(ol.Quantity - ol.PickedQuantity) > h.QuantityOnHand
-	GROUP BY Year(o.OrderDate) 
+	GROUP BY YEAR(o.OrderDate) 
 	ORDER BY YEAR(o.OrderDate) ASC;
 	`)
+
 	if err != nil {
 		return nil, err
 	}
@@ -317,4 +318,56 @@ func getRiskByYear() ([]YearRiskSummary, error) {
 	}
 
 	return items, nil
+}
+
+func getRecentRiskSummary() (RecentRiskSummary, error) {
+	db, err := database.OpenFromEnv("WWI_DB_URL")
+	if err != nil {
+		return RecentRiskSummary{}, err
+	}
+	defer db.Close()
+
+	row := db.QueryRow(`
+
+	WITH LatestData AS (
+			SELECT
+				MAX(o.OrderDate) AS LatestOrderDate,
+				DATEADD(day, -30, MAX(o.OrderDate)) AS WindowStart
+			FROM Sales.Orders o
+		)
+
+	SELECT
+		CONVERT(varchar(10), LatestData.WindowStart, 23),
+		CONVERT(varchar(10), LatestData.LatestOrderDate, 23),
+		COUNT(DISTINCT o.OrderID),
+		COUNT(*) AS RiskyLines,
+		COALESCE(SUM(ol.Quantity - ol.PickedQuantity), 0) AS TotalRemaining
+	FROM Sales.Orders o
+	CROSS JOIN LatestData
+	JOIN Sales.Orderlines ol 
+		ON o.OrderID = ol.OrderID
+	JOIN Warehouse.StockItemHoldings h
+		ON ol.StockItemID = h.StockItemID
+	WHERE o.OrderDate >= LatestData.WindowStart
+	      AND o.OrderDate <= LatestData.LatestOrderDate
+	      AND ol.PickedQuantity < ol.Quantity
+	      AND (ol.Quantity - ol.PickedQuantity) > h.QuantityOnHand
+	GROUP BY
+	      LatestData.WindowStart,
+	      LatestData.LatestOrderDate
+	`)
+
+	var summary RecentRiskSummary
+
+	if err := row.Scan(
+		&summary.WindowStart,
+		&summary.WindowEnd,
+		&summary.RiskyOrders,
+		&summary.RiskyLines,
+		&summary.TotalRemaining,
+	); err != nil {
+		return RecentRiskSummary{}, err
+	}
+
+	return summary, nil
 }

@@ -40,3 +40,11 @@ type YearRiskSummary struct {
 	RiskyLines     int
 	TotalRemaining int
 }
+
+type RecentRiskSummary struct {
+	WindowStart    string
+	WindowEnd      string
+	RiskyOrders    int
+	RiskyLines     int
+	TotalRemaining int
+}

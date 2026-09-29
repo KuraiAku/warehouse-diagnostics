@@ -133,3 +133,21 @@ func handleRiskByYear() {
 		)
 	}
 }
+
+func handleRecentRiskSummary() {
+	summary, err := diagnostics.GetRecentRiskSummary()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf(
+		"WindowStart: %s\n WindowEnd: %s\n Risky Orders: %d\nRiskyLines: %d\nTotal Remaining: %d\n",
+		summary.WindowStart,
+		summary.WindowEnd,
+		summary.RiskyOrders,
+		summary.RiskyLines,
+		summary.TotalRemaining,
+	)
+
+}
